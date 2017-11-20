@@ -51,11 +51,14 @@ def kind(n, ranks):
 # If there are two pair, return the two ranks as a
 # tuple: (highest, lowest); otherwise return None
 def two_pair(ranks):
-    pairs = set([r for r in ranks if ranks.count(r) == 2 ])
-    pairs = list(pairs)
-    if len(pairs) == 2:
-        pairs.sort(reverse=True)
-        return tuple(pairs)
+    # if there is a pair it will get the first pair, and since it is ordered that pair will be the highest pair
+    pair = kind(2, ranks)
+    # if there is another piar get the lowest of the pair
+    lowpair = kind(2, list(reversed(ranks)))
+
+    # make sure we have a pair and the lowpair does not equal the highpair
+    if pair and lowpair != pair:
+        return (pair, lowpair)
     else:
         return None
 
@@ -66,7 +69,7 @@ def test():
     fk = "9D 9H 9S 9C 7D".split()
     fh = "TD TC TH 7C 7D".split()
     fl = "3H TH JH QH 5H".split()
-    st = "8H 9C TS JH AD".split()
+    st = "8H 9C TS JH QD".split()
     tk = "KS KH KD 4C 9D".split()
     tp = "2D 2H JS JC 6C".split()
     op = "TD TS 3D 7C 2H".split()
@@ -84,7 +87,7 @@ def test():
     assert hand_rank(fk) == (7, 9, 7)
     assert hand_rank(fh) == (6, 10, 7)
     assert hand_rank(fl) == (5, [12, 11, 10, 5, 3])
-    assert hand_rank(st) == (4, 14)
+    assert hand_rank(st) == (4, 12)
     assert hand_rank(tk) == (3, 13, [13, 13, 13, 9, 4])
     assert hand_rank(tp) == (2, (11, 2), [11, 11, 6, 2, 2])
     assert hand_rank(op) == (1, 10, [10, 10, 7, 3, 2])
@@ -105,6 +108,7 @@ def test():
     
     fkranks = card_ranks(fk)
     tpranks = card_ranks(tp)
+    opranks = card_ranks(op)
 
     #kind assertions
     assert kind(4, fkranks) == 9
@@ -112,8 +116,12 @@ def test():
     assert kind(2, fkranks) == None
     assert kind(1, fkranks) == 7
 
+    #two-pair
+    assert two_pair(fkranks) == None
+    assert two_pair(tpranks) == (11, 2)
+    assert two_pair(opranks) == None
+
     return "tests pass"
 
 print(test())
     
-
