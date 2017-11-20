@@ -21,66 +21,26 @@ def deal(numhands, n=5, deck=[r+s for r in '23456789TJQKA' for s in 'SHDC']):
     random.shuffle(deck)
     return [deal[n*i:n*(i+1)] for i in range(numhands)]
 
+# Return a list of [(count, x)...], highest count first, then highest x
+def group(items):
+    groups = [(items.count(x), x) for x in set(items)]
+    return sorted(groups, reverse=True)
+
+def unzip(pairs): return zip(*pairs)
+
 # Return a value indicating the rank of a hand
 def hand_rank(hand):
-    ranks = card_ranks(hand)
-    if straight(ranks) and flush(hand):            # straight flush
-        return (8, max(ranks))
-    elif kind(4, ranks):                           # 4 of a kind
-        return (7, kind(4, ranks), kind(1, ranks))
-    elif kind(3, ranks) and kind(2, ranks):        # full house
-        return (6, kind(3, ranks), kind(2, ranks))
-    elif flush(hand):                              # flush
-        return (5, ranks)
-    elif straight(ranks):                          # straight
-        return (4, max(ranks))
-    elif kind(3, ranks):                           # 3 of a kind
-        return (3, kind(3, ranks), ranks)
-    elif two_pair(ranks):                          # 2 pair
-        return (2, two_pair(ranks), ranks)
-    elif kind(2, ranks):                           # kind
-        return (1, kind(2, ranks), ranks)
-    else:                                          # high card
-        return (0, ranks)
+    # counts is the count of each rank; ranks lists corresponding ranks
+    # e.g "7 T 7 9 7" => counts = (3, 1, 1); ranks(7, 10, 9)
+    groups = group(['--23456789TJQKA'.index(r) for r,s in cards])
+    counts, ranks = unzip(groups)
+    if (ranks == [14, 5, 4, 3, 2]):
+        ranks = [5, 4, 3, 2, 1]
+    straight = len(ranks) == 5 and max(ranks) - min(ranks) == 4
+    flush = len(set([s for r,s in hand])) == 1
+    return max(count_rankings[counts], 4*straight + 5*flush), ranks
 
-# Return a list of the ranks, sorted with higher first
-def card_ranks(cards):
-    ranks = ['--23456789TJQKA'.index(r) for r,s in cards]
-    ranks.sort(reverse=True)
-    return [5, 4, 3, 2, 1] if (ranks == [14, 5, 4, 3, 2]) else ranks
-
-# Return True if the ordered ranks form a 5-card straight.
-def straight(ranks):
-    # true if the difference between the highest and lowest card is 4
-    # and if we have 5 unique ranks
-    return (max(ranks) - min(ranks) == 4) and len(set(ranks)) == 5
-
-# Return True if all the cards have the same suit.
-def flush(hand):
-    suits = [s for r,s in hand]
-    return len(set(suits)) == 1
-
-# Return the first rank that this hand has exactly n of.
-# Return None if there is no n-of-a-kind in the hand.
-def kind(n, ranks):
-    for r in ranks:
-        if ranks.count(r) == n: return r
-    return None
-
-# If there are two pair, return the two ranks as a
-# tuple: (highest, lowest); otherwise return None
-def two_pair(ranks):
-    # if there is a pair it will get the first pair, and since it is ordered that pair will be the highest pair
-    pair = kind(2, ranks)
-    # if there is another piar get the lowest of the pair
-    lowpair = kind(2, list(reversed(ranks)))
-
-    # make sure we have a pair and the lowpair does not equal the highpair
-    if pair and lowpair != pair:
-        return (pair, lowpair)
-    else:
-        return None
-
+count_rankings = {(5,): 10, (4, 1): 7, (3, 2): 6, (3, 1, 1): 3, (2, 2, 1): 2, (2, 1, 1, 1): 1, (1, 1, 1, 1, 1): 0}
 
 # Test cases for the functions in poker program
 def test():
@@ -112,35 +72,6 @@ def test():
     assert hand_rank(tp) == (2, (11, 2), [11, 11, 6, 2, 2])
     assert hand_rank(op) == (1, 10, [10, 10, 7, 3, 2])
     assert hand_rank(hc) == (0, [12, 10, 7, 3, 2])
-
-    # card_ranks assertions
-    assert card_ranks(sf) == [10, 9, 8, 7, 6]
-    assert card_ranks(fk) == [9, 9, 9, 9, 7]
-    assert card_ranks(fh) == [10, 10, 10, 7, 7]
-    assert card_ranks(ls) == [5, 4, 3, 2, 1]
-
-    #straight assertions
-    assert straight([9, 8, 7, 6, 5]) == True
-    assert straight([9, 8, 8, 6, 5]) == False
-
-    #flush assertions
-    assert flush(sf) == True
-    assert flush(fk) == False
-    
-    fkranks = card_ranks(fk)
-    tpranks = card_ranks(tp)
-    opranks = card_ranks(op)
-
-    #kind assertions
-    assert kind(4, fkranks) == 9
-    assert kind(3, fkranks) == None
-    assert kind(2, fkranks) == None
-    assert kind(1, fkranks) == 7
-
-    #two-pair
-    assert two_pair(fkranks) == None
-    assert two_pair(tpranks) == (11, 2)
-    assert two_pair(opranks) == None
 
     return "tests pass"
 
