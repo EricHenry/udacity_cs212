@@ -1,6 +1,25 @@
+import random
+
 # Return the best hand: poker([hand, ...]) => hand
 def poker(hands):
     return max(hands, key=hand_rank)
+
+# Return a list of all items equal to the max of the iterable
+def allmax(iterable, key=None):
+    result, maxval = [], None
+    key = key or (lambda x: x)
+    for x in iterable:
+        xval = key(x)
+        if not result or xval > maxval:
+            result, maxval = [x], xval
+        elif xval == maxval:
+            result.append(x)
+    return result
+
+# Shuffle the deck and deal out numhands n-card hands
+def deal(numhands, n=5, deck=[r+s for r in '23456789TJQKA' for s in 'SHDC']):
+    random.shuffle(deck)
+    return [deal[n*i:n*(i+1)] for i in range(numhands)]
 
 # Return a value indicating the rank of a hand
 def hand_rank(hand):
