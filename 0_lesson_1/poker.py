@@ -28,7 +28,7 @@ def hand_rank(hand):
 def card_ranks(cards):
     ranks = ['--23456789TJQKA'.index(r) for r,s in cards]
     ranks.sort(reverse=True)
-    return ranks
+    return [5, 4, 3, 2, 1] if (ranks == [14, 5, 4, 3, 2]) else ranks
 
 # Return True if the ordered ranks form a 5-card straight.
 def straight(ranks):
@@ -74,6 +74,7 @@ def test():
     tp = "2D 2H JS JC 6C".split()
     op = "TD TS 3D 7C 2H".split()
     hc = "QD TS 3D 7C 2H".split()
+    ls = "AC 3S 4H 2H 5C".split()
 
     #poker assertions
     assert poker([sf, fk, fh]) == sf
@@ -97,6 +98,7 @@ def test():
     assert card_ranks(sf) == [10, 9, 8, 7, 6]
     assert card_ranks(fk) == [9, 9, 9, 9, 7]
     assert card_ranks(fh) == [10, 10, 10, 7, 7]
+    assert card_ranks(ls) == [5, 4, 3, 2, 1]
 
     #straight assertions
     assert straight([9, 8, 7, 6, 5]) == True
