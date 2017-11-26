@@ -9,6 +9,35 @@ def poker(hands):
 def best_hand(hand):
     return max(itertool.combinations(hand, 5), key=hand_rank)
 
+# Try all values for jokers in all 5-card selections.
+def best_wild_hand(hand):
+    # remove wild card
+    # 
+    if '?B' in hand and '?R' in hand:
+        hand.remove('?B')
+        hand.remove('?R')
+        s_c = [r+s for r in '23456789TJQKA' for s in 'SC']
+        h_d = [r+s for r in '23456789TJQKA' for s in 'HD']
+        hands = [hand + [sc, hd] for sc in s_c for hd in h_d]
+        # for each hand, get the combinations for that hand and have those combinations in lists
+        all_hands = [list(comb) for h in hands for comb in itertools.combinations(h, 5)] 
+        return max(all_hands, key=hand_rank)
+     
+    elif '?B' in hand:
+        hand.remove('?B')
+        hands = [hand + [r+s] for r in '23456789TJQKA' for s in 'SC']
+        all_hands = [list(comb) for h in hands for comb in itertools.combinations(h, 5) ] 
+        return max(all_hands, key=hand_rank)
+    
+    elif '?R' in hand:
+        hand.remove('?R')
+        hands = [hand + [r+s] for r in '23456789TJQKA' for s in 'HD']
+        all_hands = [list(comb) for h in hands for comb in itertools.combinations(h, 5) ] 
+        return max(all_hands, key=hand_rank)
+        
+    else:
+        return max(itertools.combinations(hand, 5), key=hand_rank)
+
 # Return a list of all items equal to the max of the iterable
 def allmax(iterable, key=None):
     result, maxval = [], None
@@ -77,6 +106,14 @@ def test():
     assert hand_rank(tp) == (2, (11, 2), [11, 11, 6, 2, 2])
     assert hand_rank(op) == (1, 10, [10, 10, 7, 3, 2])
     assert hand_rank(hc) == (0, [12, 10, 7, 3, 2])
+
+    # test_best_wild_hand
+    assert (sorted(best_wild_hand("6C 7C 8C 9C TC 5C ?B".split())) 
+            == ['7C', '8C', '9C', 'JC', 'TC'])
+    assert (sorted(best_wild_hand("TD TC 5H 5C 7C ?R ?B".split()))
+            == ['7C', 'TC', 'TD', 'TH', 'TS'])
+    assert (sorted(best_wild_hand("JD TC TH 7C 7D 7S 7H".split()))
+            == ['7C', '7D', '7H', '7S', 'JD'])
 
     return "tests pass"
 
