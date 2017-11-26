@@ -7,13 +7,7 @@ def poker(hands):
 
 # From a 7-card hand, return the best 5 card hand.
 def best_hand(hand):
-    hand_combinations = [(hand_rank(list(h)), list(h)) for h in itertools.combinations(hand, 5)]
-    highest_rank = max(hand_combinations)
-    highest_hands = [h for r, h in hand_combinations if r == highest_rank[0]]
-    if len(highest_hands) == 1:
-        return highest_hands.pop()
-    else:
-        return highest_hands
+    return max(itertool.combinations(hand, 5), key=hand_rank)
 
 # Return a list of all items equal to the max of the iterable
 def allmax(iterable, key=None):
