@@ -1,42 +1,29 @@
 import random
 import itertools
 
+allranks = '23456789TJQKA'
+redcards = [r+s for r in allranks for s in 'DH']
+blackcards = [r+s for r in allranks for s in 'CS']
+
 # Return the best hand: poker([hand, ...]) => hand
 def poker(hands):
     return max(hands, key=hand_rank)
 
 # From a 7-card hand, return the best 5 card hand.
 def best_hand(hand):
-    return max(itertool.combinations(hand, 5), key=hand_rank)
+    return max(itertools.combinations(hand, 5), key=hand_rank)
 
 # Try all values for jokers in all 5-card selections.
 def best_wild_hand(hand):
-    # remove wild card
-    # 
-    if '?B' in hand and '?R' in hand:
-        hand.remove('?B')
-        hand.remove('?R')
-        s_c = [r+s for r in '23456789TJQKA' for s in 'SC']
-        h_d = [r+s for r in '23456789TJQKA' for s in 'HD']
-        hands = [hand + [sc, hd] for sc in s_c for hd in h_d]
-        # for each hand, get the combinations for that hand and have those combinations in lists
-        all_hands = [list(comb) for h in hands for comb in itertools.combinations(h, 5)] 
-        return max(all_hands, key=hand_rank)
-     
-    elif '?B' in hand:
-        hand.remove('?B')
-        hands = [hand + [r+s] for r in '23456789TJQKA' for s in 'SC']
-        all_hands = [list(comb) for h in hands for comb in itertools.combinations(h, 5) ] 
-        return max(all_hands, key=hand_rank)
-    
-    elif '?R' in hand:
-        hand.remove('?R')
-        hands = [hand + [r+s] for r in '23456789TJQKA' for s in 'HD']
-        all_hands = [list(comb) for h in hands for comb in itertools.combinations(h, 5) ] 
-        return max(all_hands, key=hand_rank)
-        
-    else:
-        return max(itertools.combinations(hand, 5), key=hand_rank)
+    hands = set(best_hand(h) for h in itertools.product(*map(replacements, hand)))
+    return max(hands, key=hand_rank)
+
+# Return a list of possible replacements for a card.
+# There will be more than 1 only for wild cards
+def replacements(card):
+    if card == '?B': return blackcards
+    elif card == '?R': return redcards
+    else: return [card]
 
 # Return a list of all items equal to the max of the iterable
 def allmax(iterable, key=None):
