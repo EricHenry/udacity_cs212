@@ -12,10 +12,7 @@ def ints(start, end = None):
 
 "Generate integers in the order 0, +1, -1, +2, -2, +3, -3, ..."
 def all_ints():
-    i = 0
-    while True:
-        yield i
-        if i > 0:
-            i = i * -1
-        else:
-            i = i * -1 + 1
+    yield 0
+    for i in ints(1):
+        yield +i
+        yield -i
