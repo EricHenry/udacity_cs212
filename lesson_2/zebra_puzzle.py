@@ -61,8 +61,7 @@ def timedcalls(n, fn, *args):
         times = [timedcall(fn, *args)[0] for _ in range(n)]
     else:
         times = []
-        stop = time.time() + n
-        while time.time() < stop:
+        while sum(times) < n:
             times.append(timedcall(fn, *args)[0])
 
     return min(times), average(times), max(times)
