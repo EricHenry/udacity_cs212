@@ -33,11 +33,9 @@ def compile_word(word):
     """Compile a word of uppercase letters as numeric digits.
     E.g., compile_word('YOU') => '(1*U+10*O+100*Y)'
     Non-uppercase words unchanged: compile_word('+') => '+'"""
-    if not word.isalpha() or not word.isupper():
+    if word.isupper():
+        terms = [str(10**i) + '*' + c
+                 for i, c in enumerate(word[::-1])] # str[::-1] reverses a string, saying take the whole string start at the last element
+        return '(' + '+'.join(terms) + ')'
+    else:
         return word
-
-    rev_word = word[::-1]
-    translate = [str(10**idx) + '*' + c for idx, c in enumerate(rev_word)]
-    compiled = '(' + '+'.join(translate) + ')'
-
-    return compiled
