@@ -28,3 +28,16 @@ def valid(f):
         return not re.search(r'\b0[0-9]', f) and eval(f) is True
     except ArithmeticError:
         return False
+
+def compile_word(word):
+    """Compile a word of uppercase letters as numeric digits.
+    E.g., compile_word('YOU') => '(1*U+10*O+100*Y)'
+    Non-uppercase words unchanged: compile_word('+') => '+'"""
+    if not word.isalpha() or not word.isupper():
+        return word
+
+    rev_word = word[::-1]
+    translate = [str(10**idx) + '*' + c for idx, c in enumerate(rev_word)]
+    compiled = '(' + '+'.join(translate) + ')'
+
+    return compiled
