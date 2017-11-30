@@ -11,12 +11,9 @@ import string, re
 def solve(formula):
     """Given a formula like 'ODD + ODD == EVEN', fill in digits to solve it.
     Input formula is a string; output is a digit-filled-in string or None."""
-    validmappings = [f for f in fill_in(formula) if valid(f)]
-
-    if len(validmappings) == 0:
-        return None
-    else:
-        return validmappings[0]
+    for f in fill_in(formula):
+        if valid(f):
+            return f
 
 # assume: def fill_in(formula):
 #        "Generate all possible fillings-in of letters in formula with digits."
