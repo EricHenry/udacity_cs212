@@ -6,7 +6,7 @@
 # problem is not solvable.
 #
 
-import string, re
+import re, itertools
 
 def solve(formula):
     """Given a formula like 'ODD + ODD == EVEN', fill in digits to solve it.
@@ -15,9 +15,12 @@ def solve(formula):
         if valid(f):
             return f
 
-# assume: def fill_in(formula):
-#        "Generate all possible fillings-in of letters in formula with digits."
-
+def fill_in(formula):
+    "Generate all possible fillings-in of letters in formula with digits."
+    letters = ''.join(set(re.findall(r'[A-Z]', formula)))
+    for digits in itertools.permutations('1234567890', len(letters)):
+        table = str.maketrans(letters, ''.join(digits))
+        yield formula.translate(table)
 
 def valid(f):
     "Formula f id valid if it has no numbers with leadin zeros and evals true."
