@@ -29,6 +29,26 @@ def valid(f):
     except ArithmeticError:
         return False
 
+def compile_formula(formula, verbose=False):
+    """Compile formula into a function. Also return letters found, as a str,
+    in same order as parms of function. The first digit of a multi-digit
+    number can't be 0. So if YOU is a word in the formula, and the function
+    is called with Y eqal to 0, the function should return False."""
+
+    # modify the code in this function.
+
+    letters = ''.join(set(re.findall('[A-Z]', formula)))
+    parms = ', '.join(letters)
+    firstletters = set(re.findall('([A-Z]+)', formula))
+    tokens = map(compile_word, re.split('([A-Z]+)', formula))
+    body = ''.join(tokens)
+    if firstletters:
+        tests = ' and '.join(l+'!=0' for l in firstletters)
+        body = '%s and (%s)' % (tests, body)
+    f = 'lambda %s: %s' % (parms, body)
+    if verbose: print(f)
+    return eval(f), letters
+
 def compile_word(word):
     """Compile a word of uppercase letters as numeric digits.
     E.g., compile_word('YOU') => '(1*U+10*O+100*Y)'
@@ -39,3 +59,4 @@ def compile_word(word):
         return '(' + '+'.join(terms) + ')'
     else:
         return word
+
